@@ -35,7 +35,7 @@ const main = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  const PORT = process.env.PORT || 4000;
+  const PORT = process.env.PORT || 4040;
   app.listen(PORT, () =>
     console.log(
       `Server started on port ${PORT}. GrapQL server started on localhost:${PORT}${apolloServer.graphqlPath}`
