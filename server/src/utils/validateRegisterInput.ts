@@ -19,7 +19,5 @@ export const validateRegisterInput = (registerInput: RegisterInput) => {
       errors: [{ field: "password", message: "Length must be greater than 2" }],
     };
   }
-  return {
-    message: "Error internal server",
-  };
+  return null;
 };
