@@ -55,7 +55,7 @@ export class UserResolver {
       return {
         code: 200,
         success: true,
-        message: "User registration successful",
+        message: "User registration successfully",
         user: newUser,
       };
     } catch (error) {
