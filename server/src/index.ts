@@ -29,12 +29,10 @@ const main = async () => {
 
   const app = express();
 
-  const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@fsnta.ljhcp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
   // Session cookie
+  const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@fsnta.ljhcp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
   await monggose.connect(mongoUrl, {});
-
   console.log("MongoDB Connected");
-
   app.use(
     session({
       name: COOKIE_NAME,
@@ -52,6 +50,7 @@ const main = async () => {
     })
   );
 
+  // Connect apolloServer
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, UserResolver, PostResolver],
@@ -62,11 +61,10 @@ const main = async () => {
   });
 
   await apolloServer.start();
-
   apolloServer.applyMiddleware({ app, cors: false });
 
+  // Start server
   const PORT = process.env.PORT || 4040;
-
   app.listen(PORT, () =>
     console.log(
       `Server started on port ${PORT}. GrapQL server started on localhost:${PORT}${apolloServer.graphqlPath}`
@@ -74,4 +72,4 @@ const main = async () => {
   );
 };
 
-main().catch((error) => console.log(error));
+main().catch((error) => console.log("system error: ", error));
