@@ -1,19 +1,53 @@
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { FormControl } from "@chakra-ui/form-control";
 import Wrapper from "@/components/Wrapper";
 import InputField from "@/components/InputField";
 import { Button } from "@chakra-ui/button";
 import { Box } from "@chakra-ui/react";
+import { RegisterInput, useRegisterMutation } from "@/generated/graphql";
+import { mapFieldErrors } from "@/helpers/mapFieldErrors";
+import { useRouter } from "next/dist/client/router";
 
 const Register = ({}) => {
+  const router = useRouter();
+  const initialValues: RegisterInput = {
+    username: "",
+    email: "",
+    password: "",
+  };
+
+  const [registerUser, { loading: _registerUserLoading, data, error }] =
+    useRegisterMutation();
+
+  const _onRegisterSubmit = async (
+    values: RegisterInput,
+    { setErrors }: FormikHelpers<RegisterInput>
+  ) => {
+    const response = await registerUser({
+      variables: {
+        registerInput: values,
+      },
+    });
+
+    if (response.data?.register?.errors) {
+      let data = mapFieldErrors(response.data?.register?.errors);
+      console.log(123123, response);
+      console.log(data);
+      setErrors(mapFieldErrors(response.data?.register?.errors));
+    } else if (response.data?.register?.user) {
+      // Register Login
+      router.push(`/`);
+    }
+  };
   return (
     <Wrapper>
-      <Formik
-        initialValues={{ username: "", password: "" }}
-        onSubmit={(values) => {
-          console.log(values);
-        }}
-      >
+      {error && <p>Error register</p>}
+      {data && data.register?.success ? (
+        <p>Register Successfully {JSON.stringify(data)}</p>
+      ) : (
+        <p>Register Failed {JSON.stringify(data)}</p>
+      )}
+      <Formik initialValues={initialValues} onSubmit={_onRegisterSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <FormControl>
@@ -23,6 +57,14 @@ const Register = ({}) => {
                 placeholder="Username"
                 type="text"
               />
+              <Box mt={15}>
+                <InputField
+                  name="email"
+                  label="Email"
+                  placeholder="Email"
+                  type="text"
+                />
+              </Box>
               <Box mt={15}>
                 <InputField
                   name="password"

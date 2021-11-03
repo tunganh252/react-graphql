@@ -18,7 +18,7 @@ const InputField = (props: InputFieldProps) => {
 
   return (
     <div>
-      <FormControl>
+      <FormControl isInvalid={!!error}>
         <FormLabel htmlFor={field.name}>{props.label}</FormLabel>
         <Input
           {...field}
