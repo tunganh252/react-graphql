@@ -30,12 +30,9 @@ const Register = ({}) => {
     });
 
     if (response.data?.register?.errors) {
-      let data = mapFieldErrors(response.data?.register?.errors);
-      console.log(123123, response);
-      console.log(data);
       setErrors(mapFieldErrors(response.data?.register?.errors));
     } else if (response.data?.register?.user) {
-      // Register Login
+      // Register successfully
       router.push(`/`);
     }
   };
