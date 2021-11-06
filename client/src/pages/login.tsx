@@ -4,11 +4,11 @@ import Wrapper from "@/components/Wrapper";
 import InputField from "@/components/InputField";
 import { Button } from "@chakra-ui/button";
 import { Box } from "@chakra-ui/react";
-import { LoginInput, useLoginMutation } from "@/generated/graphql";
+import { LoginInput, MeDocument, MeQuery, useLoginMutation } from "@/generated/graphql";
 import { mapFieldErrors } from "@/helpers/mapFieldErrors";
 import { useRouter } from "next/dist/client/router";
 
-const Login = ({}) => {
+const Login = ({ }) => {
   const router = useRouter();
   const initialValues: LoginInput = {
     usernameOrEmail: "",
@@ -26,6 +26,16 @@ const Login = ({}) => {
       variables: {
         loginInput: values,
       },
+      update(cache, { data }) {
+        if (data?.login.success) {
+          cache.writeQuery<MeQuery>({
+            query: MeDocument,
+            data: {
+              me: data.login.user
+            }
+          })
+        }
+      }
     });
 
     if (response.data?.login?.errors) {
