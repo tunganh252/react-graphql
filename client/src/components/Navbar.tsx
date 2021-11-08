@@ -1,11 +1,16 @@
-import { MeDocument, MeQuery, useLogoutMutation, useMeQuery } from "@/generated/graphql";
+import {
+  MeDocument,
+  MeQuery,
+  useLogoutMutation,
+  useMeQuery,
+} from "@/generated/graphql";
 import { Button } from "@chakra-ui/button";
 import { Box, Flex, Heading, Link } from "@chakra-ui/layout";
 import NextLink from "next/link";
 
-const Navbar = ({ }) => {
+const Navbar = ({}) => {
   const { data, loading: useMeLoading, error: _error } = useMeQuery();
-  const [logout, { loading: useLogoutLoading }] = useLogoutMutation()
+  const [logout, { loading: useLogoutLoading }] = useLogoutMutation();
   let body;
 
   const logoutUser = async () => {
@@ -15,26 +20,27 @@ const Navbar = ({ }) => {
           cache.writeQuery<MeQuery>({
             query: MeDocument,
             data: {
-              me: null
-            }
-          })
+              me: null,
+            },
+          });
         }
-      }
-    })
-  }
+      },
+    });
+  };
 
   if (useMeLoading) {
     body = null;
   } else if (!data?.me) {
     body = (
-      <>
+      <Flex>
         <NextLink href="/login">
-          <Link mr={2}>Login</Link>
+          <Link mr={1}>Login</Link>
         </NextLink>
-        <NextLink href="/login">
-          <Link mr={2}>Register</Link>
+        <p>/</p>
+        <NextLink href="/register">
+          <Link ml={1}>Register</Link>
         </NextLink>
-      </>
+      </Flex>
     );
   } else {
     body = (
@@ -49,9 +55,7 @@ const Navbar = ({ }) => {
       <Box bg="tan" p={4}>
         <Flex maxW={800} justifyContent="space-between" m="auto" align="center">
           <NextLink href="/">
-            <Heading>
-              FsNta
-            </Heading>
+            <Heading>FsNta</Heading>
           </NextLink>
           <Box>{body}</Box>
         </Flex>

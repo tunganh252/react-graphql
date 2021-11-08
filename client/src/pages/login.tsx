@@ -1,15 +1,29 @@
 import { Form, Formik, FormikHelpers } from "formik";
-import { FormControl } from "@chakra-ui/form-control";
 import Wrapper from "@/components/Wrapper";
 import InputField from "@/components/InputField";
-import { Button } from "@chakra-ui/button";
-import { Box } from "@chakra-ui/react";
-import { LoginInput, MeDocument, MeQuery, useLoginMutation } from "@/generated/graphql";
+import {
+  Button,
+  Spinner,
+  Flex,
+  Box,
+  FormControl,
+  useToast,
+} from "@chakra-ui/react";
+import {
+  LoginInput,
+  MeDocument,
+  MeQuery,
+  useLoginMutation,
+} from "@/generated/graphql";
 import { mapFieldErrors } from "@/helpers/mapFieldErrors";
 import { useRouter } from "next/dist/client/router";
+import { useCheckAuth } from "src/utils/useCheckAuth";
 
-const Login = ({ }) => {
+const Login = ({}) => {
   const router = useRouter();
+  const { data: authData, loading: authLoading } = useCheckAuth();
+  const toast = useToast();
+
   const initialValues: LoginInput = {
     usernameOrEmail: "",
     password: "",
@@ -31,11 +45,11 @@ const Login = ({ }) => {
           cache.writeQuery<MeQuery>({
             query: MeDocument,
             data: {
-              me: data.login.user
-            }
-          })
+              me: data.login.user,
+            },
+          });
         }
-      }
+      },
     });
 
     if (response.data?.login?.errors) {
@@ -44,48 +58,58 @@ const Login = ({ }) => {
       setErrors(mapFieldErrors(response.data?.login?.errors));
     } else if (response.data?.login?.user) {
       // Login successfully
+      toast({
+        title: "Welcome.",
+        description: `${response.data.login.user.username}`,
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
       router.push(`/`);
     }
   };
   return (
-    <Wrapper>
-      {error && <p>Error login</p>}
-      {data && data.login.success ? (
-        <p>Login Successfully {JSON.stringify(data)}</p>
+    <>
+      {authLoading || (!authLoading && authData?.me) ? (
+        <Flex minH="100vh" justifyContent="center" alignItems="center">
+          <Spinner />
+        </Flex>
       ) : (
-        <p>Login Failed {JSON.stringify(data)}</p>
+        <Wrapper>
+          {error && <p>Error login</p>}
+          <Formik initialValues={initialValues} onSubmit={_onLoginSubmit}>
+            {({ isSubmitting }) => (
+              <Form>
+                <FormControl>
+                  <InputField
+                    name="usernameOrEmail"
+                    label="Username or email"
+                    placeholder="Username or email"
+                    type="text"
+                  />
+                  <Box mt={15}>
+                    <InputField
+                      name="password"
+                      label="Password"
+                      placeholder="Password"
+                      type="password"
+                    />
+                  </Box>
+                  <Button
+                    type="submit"
+                    colorScheme="teal"
+                    mt={4}
+                    isLoading={isSubmitting}
+                  >
+                    Login
+                  </Button>
+                </FormControl>
+              </Form>
+            )}
+          </Formik>
+        </Wrapper>
       )}
-      <Formik initialValues={initialValues} onSubmit={_onLoginSubmit}>
-        {({ isSubmitting }) => (
-          <Form>
-            <FormControl>
-              <InputField
-                name="usernameOrEmail"
-                label="Username or email"
-                placeholder="Username or email"
-                type="text"
-              />
-              <Box mt={15}>
-                <InputField
-                  name="password"
-                  label="Password"
-                  placeholder="Password"
-                  type="password"
-                />
-              </Box>
-              <Button
-                type="submit"
-                colorScheme="teal"
-                mt={4}
-                isLoading={isSubmitting}
-              >
-                Login
-              </Button>
-            </FormControl>
-          </Form>
-        )}
-      </Formik>
-    </Wrapper>
+    </>
   );
 };
 
