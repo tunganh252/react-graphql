@@ -1,4 +1,6 @@
 import Navbar from "@/components/Navbar";
+import { GetPostsDocument } from "@/generated/graphql";
+import { addApolloState, initializeApollo } from "src/lib/apolloClient";
 
 const Index = () => (
   <>
@@ -6,5 +8,16 @@ const Index = () => (
     <h1>Hello World</h1>
   </>
 );
+
+export const getStaticProps = async () => {
+  const apolloClient = initializeApollo();
+  await apolloClient.query({
+    query: GetPostsDocument,
+  });
+
+  return addApolloState(apolloClient, {
+    props: {},
+  });
+};
 
 export default Index;
