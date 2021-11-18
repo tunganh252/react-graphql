@@ -5,6 +5,12 @@ import { AppProps } from "next/app";
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "src/lib/apolloClient";
 
+// const client = new ApolloClient({
+//   uri: "http://localhost:4040/graphql",
+//   cache: new InMemoryCache(),
+//   credentials: "include",
+// });
+
 function MyApp({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps);
   return (

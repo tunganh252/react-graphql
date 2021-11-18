@@ -18,6 +18,8 @@ import {
 import { mapFieldErrors } from "@/helpers/mapFieldErrors";
 import { useRouter } from "next/dist/client/router";
 import { useCheckAuth } from "src/utils/useCheckAuth";
+import { Link } from "@chakra-ui/layout";
+import NextLink from "next/link";
 
 const Login = ({}) => {
   const router = useRouter();
@@ -29,7 +31,7 @@ const Login = ({}) => {
     password: "",
   };
 
-  const [loginUser, { loading: _loginUserLoading, data, error }] =
+  const [loginUser, { loading: _loginUserLoading, data: _data, error }] =
     useLoginMutation();
 
   const _onLoginSubmit = async (
@@ -94,6 +96,11 @@ const Login = ({}) => {
                       placeholder="Password"
                       type="password"
                     />
+                  </Box>
+                  <Box mt={15}>
+                    <NextLink href="/forgot-password">
+                      <Link mr={1}>Forgot Password</Link>
+                    </NextLink>
                   </Box>
                   <Button
                     type="submit"

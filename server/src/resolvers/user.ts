@@ -1,5 +1,7 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import argon2 from "argon2";
+import { v4 as uuidv4 } from "uuid";
+
 import { User } from "../entities/User";
 import { UserMutationResponse } from "../types/UserMutationResponse";
 import { RegisterInput } from "../types/RegisterInput";
@@ -7,6 +9,9 @@ import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { Context } from "../types/Context";
 import { COOKIE_NAME } from "../constants";
+import { ForgotPasswordInput } from "../types/ForgotPasswordInput";
+import { sendEmail } from "../utils/sendEmail";
+import { TokenModel } from "../models/Token";
 
 @Resolver()
 export class UserResolver {
@@ -151,5 +156,31 @@ export class UserResolver {
         resolve(true);
       });
     });
+  }
+
+  @Mutation((_return) => Boolean)
+  async forgotPassword(
+    @Arg("forgotPasswordInput") { email }: ForgotPasswordInput
+  ): Promise<Boolean> {
+    const user = await User.findOne({ email });
+    console.log(111, user);
+
+    if (!user) return false;
+    const resetToken = uuidv4();
+    const hashedRequestToken = await argon2.hash(resetToken);
+
+    // save token to db
+    await new TokenModel({
+      userId: `${user.id}`,
+      token: hashedRequestToken,
+    }).save();
+
+    // send reset password link to user via email
+    await sendEmail(
+      email,
+      `<a href="http://localhost:5050/change-password?token=${resetToken}&userId=${user.id}">Click here to reset your password</a>`
+    );
+
+    return true;
   }
 }
