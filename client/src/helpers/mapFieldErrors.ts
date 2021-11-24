@@ -10,7 +10,9 @@ import { FieldError } from "@/generated/graphql";
     user: "username error"
 }
  */
-export const mapFieldErrors = (errors: FieldError[]) => {
+export const mapFieldErrors = (
+  errors: FieldError[]
+): { [key: string]: any } => {
   return errors.reduce((ack, err) => {
     return {
       ...ack,

@@ -99,7 +99,7 @@ const Login = ({}) => {
                   </Box>
                   <Box mt={15}>
                     <NextLink href="/forgot-password">
-                      <Link mr={1}>Forgot Password</Link>
+                      <Link ml={"auto"}>Forgot Password</Link>
                     </NextLink>
                   </Box>
                   <Button
